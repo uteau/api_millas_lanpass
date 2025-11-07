@@ -23,7 +23,15 @@ defmodule MillasLanpass.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: MillasLanpass.Supervisor]
-    Supervisor.start_link(children, opts)
+    #Supervisor.start_link(children, opts)
+    case Supervisor.start_link(children, opts) do
+      {:ok, _pid} = result ->
+        seed_database()
+        result
+
+      other ->
+        other
+    end
   end
 
   # Tell Phoenix to update the endpoint configuration
@@ -37,5 +45,25 @@ defmodule MillasLanpass.Application do
   defp skip_migrations?() do
     # By default, sqlite migrations are run when using a release
     System.get_env("RELEASE_NAME") == nil
+  end
+
+  defp seed_database do
+    # Pequeña pausa para asegurar que el Repo esté listo
+    :timer.sleep(500)
+
+    # Verificar si ya hay usuarios para no ejecutar semillas múltiples veces
+    case MillasLanpass.Repo.all(MillasLanpass.Usuarios.Usuario) do
+      [] ->
+        IO.puts "🌱 Ejecutando semillas automáticamente..."
+        Mix.Task.run("run", ["priv/repo/seeds.exs"])
+        IO.puts "✅ Semillas ejecutadas correctamente!"
+      _ ->
+        IO.puts "✅ Base de datos ya tiene datos, omitiendo semillas."
+        #Mix.Task.run("run", ["priv/repo/seeds.exs"])
+    end
+  rescue
+    error ->
+      IO.puts "⚠️  Error ejecutando semillas: #{inspect(error)}"
+      IO.puts "💡 Ejecuta manualmente: mix run priv/repo/seeds.exs"
   end
 end

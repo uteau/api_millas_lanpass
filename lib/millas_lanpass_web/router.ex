@@ -18,8 +18,29 @@ defmodule MillasLanpassWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/login", PageController, :login
+    get "/dashboard", PageController, :dashboard
+
+    # Rutas live
+    live "/usuarios/:id", UsuarioLive
   end
 
+  scope "/api", MillasLanpassWeb do
+    pipe_through :api
+
+    # Usuarios
+    resources "/usuarios", UsuarioController, except: [:new, :edit] do
+      get "/estado", UsuarioController, :estado, on: :member
+      get "/transacciones", TransaccionController, :historial, on: :member
+    end
+
+    # Transacciones
+    resources "/transacciones", TransaccionController, except: [:new, :edit]
+
+    # Rutas personalizadas EXPLÍCITAS (sin nesting)
+    post "/transacciones/acumular", TransaccionController, :acumular
+    post "/transacciones/canjear", TransaccionController, :canjear
+  end
   # Other scopes may use custom stacks.
   # scope "/api", MillasLanpassWeb do
   #   pipe_through :api

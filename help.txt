@@ -1,0 +1,68 @@
+mix deps.get            actualiza dependencias de mix.exs
+
+# COMANDOS DE PRUEBA
+
+#CREAR USUARIO
+
+curl -X POST http://localhost:4000/api/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{
+    "usuario": {
+      "nombre": "Bruno Guerra",
+      "email": "bruno@gmail.com",
+      "rut": "12345678-9",
+      "categoria": "LATAM",
+      "puntos_calificables": 0
+    }
+  }'
+
+# BUSCAR USUARIO
+curl http://localhost:4000/api/usuarios/1
+
+# VER MILLAS Y DAOTS DEL USUARIO
+curl http://localhost:4000/api/usuarios/1/estado
+
+# ACUTALIZAR USUARIO
+curl -X PATCH http://localhost:4000/api/usuarios/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "usuario": {
+      "nombre": "Bruno Guerra Actualizado",
+      "categoria": "GOLD"
+    }
+  }'
+
+# ELIMINAR USUARIO
+curl -X DELETE http://localhost:4000/api/usuarios/1
+
+# ACUMULAR MILLAS
+curl -X POST http://localhost:4000/api/transacciones/acumular \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaccion": {
+      "usuario_id": 1,
+      "precio": 1000,
+      "impuestos": 100,
+      "tipo_vuelo": "nacional",
+      "tipo_clase": "basic"
+    }
+  }'
+
+
+# CANJEAR MILLAS
+curl -X POST http://localhost:4000/api/transacciones/canjear \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaccion": {
+      "usuario_id": 1,
+      "millas": 500,
+      "descripcion": "Canje por hotel"
+    }
+  }'
+
+# LISTAR TRANSACCIONES
+curl http://localhost:4000/api/transacciones
+
+curl http://localhost:4000/api/transacciones/1
+
+curl http://localhost:4000/api/usuarios/1/transacciones
